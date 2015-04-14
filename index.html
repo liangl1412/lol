@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Midterm Project</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<body>
+<input id="playerName" type="text"></input>
+<input type="submit" id="start"/>
+<script>
+var playerName;
+var playerID;
+
+var init = function() {
+	playerName = $("#playerName").val();
+	getID(playerName);
+}
+		
+var getID = function(playerName) {
+	$.ajax({
+        type: "POST",
+        url:"test.php",
+        dataType:'json', 
+			data: {'url': "api/lol/na/v1.4/summoner/by-name/"+playerName},
+        success: function(data){
+           playerID = data[playerName].id;
+           getMatches(playerID);
+
+        }
+    });
+};
+
+var getMatches = function(playerID) {
+	$.ajax({
+        type: "POST",
+        url:"test.php",
+        dataType:'json', 
+			data: {'url': "api/lol/na/v2.2/matchhistory/"+playerID,},
+        success: function(data){
+           console.log(data);
+
+			
+        }
+    });
+};
+var getMatch = function(matchID) {
+
+};
+var getItem = function(itemID) {
+
+};
+var getRunes = function(playerID) {
+
+};
+var getMastery = function(playerID) {
+
+};
+var getMasteryImage = function() {
+
+};
+
+$("#start").click(function(){
+	init();
+})
+
+</script>
+</body>
+</html>
