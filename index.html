@@ -10,9 +10,10 @@
 <script>
 var playerName;
 var playerID;
+var participantsName = [];
 
 var init = function() {
-	playerName = $("#playerName").val();
+	playerName = $("#playerName").val().toLowerCase();
 	getID(playerName);
 }
 		
@@ -21,11 +22,37 @@ var getID = function(playerName) {
         type: "POST",
         url:"test.php",
         dataType:'json', 
-			data: {'url': "api/lol/na/v1.4/summoner/by-name/"+playerName},
+			data: {'url': "api/lol/na/v1.4/summoner/by-name/"+playerName+"?"},
         success: function(data){
            playerID = data[playerName].id;
-           getMatches(playerID);
+           console.log(playerID);
+           getCurrentMatch(playerID);
 
+        }
+    });
+};
+
+var getCurrentMatch = function(playerID) {
+	$.ajax({
+        type: "POST",
+        url:"test.php",
+        dataType:'json', 
+			data: {'url': "/observer-mode/rest/consumer/getSpectatorGameInfo/NA1/"+playerID+"?",},
+        success: function(data){
+           	console.log(data.participants);
+        	$.each( data.participants, function( index, player ) {
+                
+                var html = "<div>" + player.summonerName + "<div>";
+                
+                $("body").append(html);
+                console.log(player.championId);
+                getChampionInfo(player.championId);
+
+                
+                
+			  	
+			});
+			
         }
     });
 };
@@ -35,9 +62,9 @@ var getMatches = function(playerID) {
         type: "POST",
         url:"test.php",
         dataType:'json', 
-			data: {'url': "api/lol/na/v2.2/matchhistory/"+playerID,},
+			data: {'url': "api/lol/na/v2.2/matchhistory/"+playerID+"?",},
         success: function(data){
-           console.log(data);
+           
 
 			
         }
@@ -58,6 +85,18 @@ var getMastery = function(playerID) {
 var getMasteryImage = function() {
 
 };
+var getChampionInfo = function(championID) {
+	$.ajax({
+        type: "POST",
+        url:"test.php",
+        dataType:'json', 
+			data: {'url': "api/lol/static-data/na/v1.2/champion?dataById=true&champData=image&",},
+        success: function(data){
+            console.log(data.data[championID]);
+        }
+    });
+};
+
 
 $("#start").click(function(){
 	init();
