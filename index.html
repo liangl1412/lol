@@ -4,13 +4,19 @@
 <meta charset="UTF-8">
 <title>Midterm Project</title>
 <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+<style>
+    div {
+        margin:10px;
+    }
+</style>
+</head>
 <body>
 <input id="playerName" type="text"></input>
 <input type="submit" id="start"/>
 <script>
 var playerName;
 var playerID;
-var participantsName = [];
+var participants;
 
 var init = function() {
 	playerName = $("#playerName").val().toLowerCase();
@@ -37,21 +43,13 @@ var getCurrentMatch = function(playerID) {
         type: "POST",
         url:"test.php",
         dataType:'json', 
+        
 			data: {'url': "/observer-mode/rest/consumer/getSpectatorGameInfo/NA1/"+playerID+"?",},
         success: function(data){
-           	console.log(data.participants);
-        	$.each( data.participants, function( index, player ) {
-                
-                var html = "<div>" + player.summonerName + "<div>";
-                
-                $("body").append(html);
-                console.log(player.championId);
-                getChampionInfo(player.championId);
+            console.log(data);
+            participants = data.participants;
+            getChampionInfo(participants);
 
-                
-                
-			  	
-			});
 			
         }
     });
@@ -85,14 +83,19 @@ var getMastery = function(playerID) {
 var getMasteryImage = function() {
 
 };
-var getChampionInfo = function(championID) {
+var getChampionInfo = function(participants) {
 	$.ajax({
         type: "POST",
         url:"test.php",
         dataType:'json', 
-			data: {'url': "api/lol/static-data/na/v1.2/champion?dataById=true&champData=image&",},
+        data: {'url': "api/lol/static-data/na/v1.2/champion?dataById=true&champData=image&",},
         success: function(data){
-            console.log(data.data[championID]);
+            $.each(participants, function(index,participant){
+                var html = "<div>" + participant.summonerName + "<br>" + data.data[participant.championId].name + "<br>" + data.data[participant.championId].image.full + "<br>" + participant.spell1Id + " " + participant.spell2Id +  "<div>"
+                $("body").append(html);
+            })
+            console.log(data);
+            
         }
     });
 };
@@ -101,6 +104,9 @@ var getChampionInfo = function(championID) {
 $("#start").click(function(){
 	init();
 })
+
+
+
 
 </script>
 </body>
